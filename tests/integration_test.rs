@@ -1,6 +1,6 @@
 // ```sh
 // # test all:
-// cargo test -F all
+// cargo test --all-features
 //
 // # mock run:
 // cargo run --example smoke_test --features show
