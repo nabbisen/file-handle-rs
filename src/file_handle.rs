@@ -1,7 +1,7 @@
 #[cfg(feature = "show")]
 use std::path::Path;
 
-#[cfg(feature = "show")]
+#[allow(unused_imports)]
 use crate::FileHandleError;
 
 #[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
