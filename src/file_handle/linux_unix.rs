@@ -1,10 +1,9 @@
 #[cfg(feature = "show")]
 use std::path::Path;
 
-#[cfg(feature = "show")]
-use crate::FileHandleError;
-
 use super::FileHandle;
+#[allow(unused_imports)]
+use crate::FileHandleError;
 
 impl FileHandle {
     #[cfg(feature = "show")]

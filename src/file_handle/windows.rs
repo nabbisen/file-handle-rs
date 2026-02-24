@@ -1,4 +1,6 @@
 use super::FileHandle;
+#[allow(unused_imports)]
+use crate::FileHandleError;
 
 impl FileHandle {
     #[cfg(feature = "show")]
