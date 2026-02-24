@@ -1,3 +1,8 @@
+#[allow(unused_imports)]
+use std::path::Path;
+#[allow(unused_imports)]
+use std::process::Command;
+
 use super::FileHandle;
 #[allow(unused_imports)]
 use crate::FileHandleError;
@@ -11,7 +16,7 @@ impl FileHandle {
         Command::new("explorer.exe")
             .arg(arg)
             .spawn()?
-            .status()
+            .wait()
             .map(|_| ())
             .map_err(|e| FileHandleError::OpFailed(e.to_string()))
     }
@@ -22,7 +27,7 @@ impl FileHandle {
             .args(["/C", "start", "cmd.exe"])
             .current_dir(path)
             .spawn()?
-            .status()
+            .wait()
             .map(|_| ())
             .map_err(|e| FileHandleError::OpFailed(e.to_string()))
     }

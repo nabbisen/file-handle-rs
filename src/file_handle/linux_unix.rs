@@ -1,4 +1,4 @@
-#[cfg(feature = "show")]
+#[allow(unused_imports)]
 use std::path::Path;
 
 use super::FileHandle;
@@ -37,13 +37,14 @@ impl FileHandle {
 
     #[cfg(feature = "terminal")]
     pub fn dispatch_terminal(path: &Path) -> Result<(), FileHandleError> {
-        for term in ["xdg-terminal-exec", "gnome-terminal", "konsole", "xterm"] {
-            use std::process::Command;
+        use std::process::Command;
 
+        for term in ["xdg-terminal-exec", "gnome-terminal", "konsole", "xterm"] {
             if Command::new(term).current_dir(path).spawn().is_ok() {
                 return Ok(());
             }
         }
+
         Err(FileHandleError::OpFailed("No terminal found".into()))
     }
 }

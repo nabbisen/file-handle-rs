@@ -1,3 +1,8 @@
+#[allow(unused_imports)]
+use std::path::Path;
+#[allow(unused_imports)]
+use std::process::Command;
+
 use super::FileHandle;
 #[allow(unused_imports)]
 use crate::FileHandleError;
@@ -13,7 +18,7 @@ impl FileHandle {
 
         cmd.arg(path)
             .spawn()?
-            .status()
+            .wait()
             .map(|_| ())
             .map_err(|e| FileHandleError::OpFailed(e.to_string()))
     }
@@ -24,7 +29,7 @@ impl FileHandle {
             .args(["-a", "Terminal"])
             .arg(path)
             .spawn()?
-            .status()
+            .wait()
             .map(|_| ())
             .map_err(|e| FileHandleError::OpFailed(e.to_string()))
     }
