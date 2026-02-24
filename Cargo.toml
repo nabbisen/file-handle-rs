@@ -1,0 +1,36 @@
+[package]
+name = "file-handle"
+version = "0.1.0"
+edition = "2024"
+
+description = "A humble library to show files in the system manager, open terminals, or move items to the trash."
+authors = ["nabbisen <nabbisen@scqr.net>"]
+license = "Apache-2.0"
+
+categories = ["filesystem"]
+keywords = ["filesystem", "file"]
+repository = "https://github.com/nabbisen/file-handle-rs"
+readme = "README.md"
+rust-version = "1.90"
+
+[features]
+# function isolation for minimal build
+default = []
+show = ["dep:url", "dep:zbus"]
+terminal = []
+trash = ["dep:trash_lib"]
+# provide all features
+all = ["show", "terminal", "trash"]
+
+[dependencies]
+thiserror = "2"
+
+# linux and feature = "show" specific
+url = { version = "2", optional = true }
+zbus = { version = "5", default-features = false, features = ["blocking-api", "async-io"], optional = true }
+
+# feature = "trash" specific
+trash_lib = { package = "trash", version = "5", optional = true }
+
+[dev-dependencies]
+tempfile = "*"
