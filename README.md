@@ -16,6 +16,23 @@ A humble Rust library to show files in the system manager, open terminals, or mo
 - **Modernity**: Clean, type-safe API designed for the latest Rust editions.
 - **Flexibility**: Feature flags to ensure you only compile what you actually use.
 
+## Usage
+
+### Important note 🗒️ for first-time users
+
+If you simply add `file-handle` to your dependencies **without specifying any features**, you will not see any methods available under `FileHandle::`.
+
+To keep compile time fast and the dependency tree as small as possible, `file-handle` is entirely opt-in. You must explicitly enable the features you want to use, or enable the all feature to get everything.
+
+### Feature flags
+
+| Flag | Method Enabled | Description |
+| --- | --- | --- |
+| `show` | `FileHandle::show(path)` | Opens the system's file manager. If the path is a file, it opens the parent folder and selects the file. If it's a directory, it opens that directory. (Uses zbus on Linux) |
+| `terminal` | `FileHandle::open_terminal(path)` | Opens the system's default terminal emulator at the specified path. |
+| `trash` | `FileHandle::trash(path)` | Moves the specified file or directory to the system trash/recycle bin. (Uses the trash crate) |
+| `all` | All methods | Enables show, terminal, and trash all at once. |
+
 ---
 
 ## Open-source, with care

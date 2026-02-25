@@ -1,6 +1,6 @@
 [package]
 name = "file-handle"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 description = "A humble library to show files in the system manager, open terminals, or move items to the trash."
