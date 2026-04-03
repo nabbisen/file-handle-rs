@@ -6,7 +6,7 @@
 [![Dependency Status](https://deps.rs/crate/file-handle/latest/status.svg)](https://deps.rs/crate/file-handle)
 [![CI tests](https://github.com/nabbisen/file-handle-rs/actions/workflows/test.yaml/badge.svg)](https://github.com/nabbisen/file-handle-rs/actions/workflows/test.yaml)
 
-A humble Rust library to show files in the system manager, open terminals, or move items to the trash.
+A lean lib to manage files: open with default apps, reveal in managers or terminals, or trash files.
 
 ## Design goals
 
