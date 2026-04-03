@@ -6,6 +6,9 @@
 // cargo run --example smoke_test --features show
 // ```
 
+#[cfg(feature = "open")]
+#[path = "integration_test/open.rs"]
+mod open;
 #[cfg(feature = "show")]
 #[path = "integration_test/show.rs"]
 mod show;

@@ -8,6 +8,20 @@ use super::FileHandle;
 use crate::FileHandleError;
 
 impl FileHandle {
+    #[cfg(feature = "open")]
+    pub fn dispatch_open(path: &Path) -> Result<(), FileHandleError> {
+        // Windows では `cmd /C start "" <path>` がシェルの関連付けを経由して
+        // デフォルトアプリを起動する最も互換性の高い方法。
+        // 第1引数の空文字列はウィンドウタイトルのプレースホルダー（必須）。
+        Command::new("cmd")
+            .args(["/C", "start", ""])
+            .arg(path)
+            .spawn()?
+            .wait()
+            .map(|_| ())
+            .map_err(|e| FileHandleError::OpFailed(e.to_string()))
+    }
+
     #[cfg(feature = "show")]
     pub fn dispatch_show(path: &Path, is_dir: bool) -> Result<(), FileHandleError> {
         let mut arg = std::ffi::OsString::from(if is_dir { "" } else { "/select," });

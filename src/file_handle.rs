@@ -1,4 +1,4 @@
-#[cfg(feature = "show")]
+#[cfg(any(feature = "show", feature = "open", feature = "terminal"))]
 use std::path::Path;
 
 #[allow(unused_imports)]
@@ -15,6 +15,20 @@ mod windows;
 pub struct FileHandle;
 
 impl FileHandle {
+    // --- feature: open ---
+    /// Opens the file (or directory) with the OS default application
+    /// associated with its type / extension.
+    #[cfg(feature = "open")]
+    pub fn open_with_default<P: AsRef<Path>>(path: P) -> Result<(), FileHandleError> {
+        let path = path.as_ref();
+
+        if !path.exists() {
+            return Err(FileHandleError::NotFound(path.to_owned()));
+        }
+
+        Self::dispatch_open(path)
+    }
+
     // --- feature: show ---
     /// Opens the file manager and selects the path (or opens the directory).
     #[cfg(feature = "show")]

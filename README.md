@@ -28,10 +28,11 @@ To keep compile time fast and the dependency tree as small as possible, `file-ha
 
 | Flag | Method Enabled | Description |
 | --- | --- | --- |
+| `open` | `FileHandle::open_with_default(path)` | Opens the file using the system's default application associated with its file extension. |
 | `show` | `FileHandle::show(path)` | Opens the system's file manager. If the path is a file, it opens the parent folder and selects the file. If it's a directory, it opens that directory. (Uses zbus on Linux) |
 | `terminal` | `FileHandle::open_terminal(path)` | Opens the system's default terminal emulator at the specified path. |
 | `trash` | `FileHandle::trash(path)` | Moves the specified file or directory to the system trash/recycle bin. (Uses the trash crate) |
-| `all` | All methods | Enables show, terminal, and trash all at once. |
+| `all` | All methods | Enables open, show, terminal, and trash all at once. |
 
 ---
 
