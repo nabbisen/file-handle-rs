@@ -1,6 +1,6 @@
 [package]
 name = "file-handle"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 
 description = "A humble library to show files in the system manager, open terminals, or move items to the trash."
@@ -16,11 +16,12 @@ rust-version = "1.90"
 [features]
 # function isolation for minimal build
 default = []
+open = []
 show = ["dep:url", "dep:zbus"]
 terminal = []
 trash = ["dep:trash_lib"]
 # provide all features
-all = ["show", "terminal", "trash"]
+all = ["open", "show", "terminal", "trash"]
 
 [dependencies]
 thiserror = "2"
