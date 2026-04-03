@@ -10,10 +10,8 @@ use crate::FileHandleError;
 impl FileHandle {
     #[cfg(feature = "open")]
     pub fn dispatch_open(path: &Path) -> Result<(), FileHandleError> {
-        // macOS の `open` コマンドは拡張子 / UTI に基づいてデフォルトアプリを起動する。
-        // `-W` フラグを付けることでアプリが終了するまで待機する。
+        // macOS の `open` コマンドは拡張子 / UTI に基づいてデフォルトアプリを起動する
         Command::new("open")
-            .arg("-W")
             .arg(path)
             .spawn()?
             .wait()
