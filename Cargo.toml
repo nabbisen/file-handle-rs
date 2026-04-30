@@ -1,10 +1,10 @@
 [package]
 name = "file-handle"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2024"
 
 description = "A lean lib to manage files: open with default apps, reveal in managers or terminals, or trash files."
-authors = ["nabbisen <nabbisen@scqr.net>"]
+authors = ["nabbisen"]
 license = "Apache-2.0"
 
 categories = ["filesystem"]
