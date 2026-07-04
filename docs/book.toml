@@ -1,0 +1,8 @@
+[book]
+title = "file-handle"
+authors = ["nabbisen"]
+src = "src"
+language = "en"
+
+[build]
+build-dir = "book"

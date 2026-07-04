@@ -5,10 +5,9 @@ use tempfile::tempdir;
 fn test_terminal_integration() {
     let dir = tempdir().unwrap();
 
-    // ディレクトリでターミナルを開く試行
-    // assert はしない
-    // 理由 = CI 環境（Headless Linux 等）では標準ターミナルが見つからずエラーになる可能性がある
-    //        結果の Ok / Err が環境に依存する
+    // Try opening a terminal in a directory without asserting the result.
+    // Headless CI environments may not have a standard terminal available, so
+    // Ok / Err is environment-dependent.
     let result = FileHandle::open_terminal(dir.path());
     println!("Terminal open result: {:?}", result);
 }

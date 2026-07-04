@@ -1,4 +1,9 @@
 mod error;
 mod file_handle;
 
-pub use {error::FileHandleError, file_handle::FileHandle};
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
+pub use error::Operation;
+pub use {
+    error::FileHandleError,
+    file_handle::{BatchOutcome, FileHandle},
+};

@@ -1,4 +1,4 @@
-// 開発者が目視で確認するための簡易ツール
+// Simple manual-check tool for developers.
 // ```sh
 // cargo run --example smoke_test --features show
 // ```

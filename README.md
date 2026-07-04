@@ -8,23 +8,45 @@
 
 A lean lib to manage files: open with default apps, reveal in managers or terminals, or trash files.
 
-## Design goals
+## Overview
 
-`file-handle` was created to provide a minimal and dependency-conscious way to handle common desktop interactions. This project focuses on:
+`file-handle` provides small, feature-gated Rust APIs for common desktop file
+actions. It delegates to native OS handlers where possible and keeps optional
+dependencies behind operation-specific feature flags.
 
-- **Minimalism**: Small dependency footprint using native commands where possible.
-- **Modernity**: Clean, type-safe API designed for the latest Rust editions.
-- **Flexibility**: Feature flags to ensure you only compile what you actually use.
+## Why / When
 
-## Usage
+Use this crate when an application needs to:
 
-### Important note 🗒️ for first-time users
+- open files or directories with the OS default app;
+- reveal paths in the system file manager;
+- open a terminal at a path;
+- move files or directories to the system trash;
+- report partial failures for multi-selection file actions.
 
-If you simply add `file-handle` to your dependencies **without specifying any features**, you will not see any methods available under `FileHandle::`.
+## Quick Start
 
-To keep compile time fast and the dependency tree as small as possible, `file-handle` is entirely opt-in. You must explicitly enable the features you want to use, or enable the all feature to get everything.
+```toml
+[dependencies]
+file-handle = { version = "0.3", features = ["open", "show", "trash"] }
+```
 
-### Feature flags
+```rust
+use file_handle::FileHandle;
+
+let outcome = FileHandle::trash_all(["old-a.txt", "old-b.txt"]);
+
+if outcome.any_failed() {
+    for (path, error) in outcome.failed {
+        eprintln!("{}: {error}", path.display());
+    }
+}
+```
+
+If you add `file-handle` without features, no operation methods are enabled.
+Enable the features you need, or use `all`.
+
+## Features / Design Notes
 
 | Flag | Method Enabled | Description |
 | --- | --- | --- |
@@ -34,7 +56,24 @@ To keep compile time fast and the dependency tree as small as possible, `file-ha
 | `trash` | `FileHandle::trash(path)` | Moves the specified file or directory to the system trash/recycle bin. (Uses the trash crate) |
 | `all` | All methods | Enables open, show, terminal, and trash all at once. |
 
----
+The `open`, `show`, and `trash` features also provide batch helpers:
+`FileHandle::open_all(paths)`, `FileHandle::show_all(paths)`, and
+`FileHandle::trash_all(paths)`. These return a `BatchOutcome` with per-path
+successes and failures, so callers can report partial failure without stopping
+at the first error.
+
+When no suitable OS handler is available for `open`, `show`, or `terminal`,
+the error is reported as `FileHandleError::NoHandlerAvailable`. Native launcher
+success is best-effort: many desktop launchers hand off to another application
+and return immediately.
+
+`trash` and `trash_all` treat dangling symlinks as trashable filesystem entries.
+`show` and `show_all` currently follow symlink targets and may report a dangling
+symlink as `NotFound`.
+
+## More Detail
+
+Full documentation lives under [`docs/src`](./docs/src/SUMMARY.md).
 
 ## Open-source, with care
 
@@ -44,4 +83,4 @@ Please understand that the project has its own direction — while we welcome fe
 
 ## Acknowledgements
 
-Depends on [thiserror](https://crates.io/crates/thiserror), [url](https://crates.io/crates/url), [zbus](https://crates.io/crates/zbus), [trash](https://crates.io/crates/trash), In addition, [tempfile](https://crates.io/crates/tempfile) for test automation.
+Depends on [thiserror](https://crates.io/crates/thiserror), [url](https://crates.io/crates/url), [zbus](https://crates.io/crates/zbus), and [trash](https://crates.io/crates/trash). Uses [tempfile](https://crates.io/crates/tempfile) for test automation.
