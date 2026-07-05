@@ -2,6 +2,7 @@ use file_handle::FileHandle;
 use tempfile::tempdir;
 
 #[test]
+#[ignore = "opens the system terminal application"]
 fn test_terminal_integration() {
     let dir = tempdir().unwrap();
 

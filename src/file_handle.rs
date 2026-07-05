@@ -7,7 +7,6 @@
 use std::path::Path;
 use std::path::PathBuf;
 
-#[allow(unused_imports)]
 use crate::FileHandleError;
 
 #[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
@@ -19,6 +18,20 @@ mod windows;
 
 /// A humble helper for file-related UI operations.
 pub struct FileHandle;
+
+/// Advisory availability result for side-effect-free capability probes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum Availability {
+    /// A supported launcher appears available in the current process
+    /// environment.
+    Available,
+    /// No supported launcher is currently detected, or the environment is
+    /// clearly unsuitable for the operation.
+    Unavailable,
+    /// The probe cannot make a useful advisory decision without out-of-scope
+    /// work or side effects.
+    Unknown,
+}
 
 /// Per-path result report for batch file operations.
 #[derive(Debug, Default)]
@@ -90,6 +103,13 @@ impl FileHandle {
         };
 
         Self::dispatch_terminal(dir)
+    }
+
+    /// Reports whether opening a terminal appears worth trying in this process
+    /// environment.
+    #[cfg(feature = "terminal")]
+    pub fn terminal_availability() -> Availability {
+        Self::dispatch_terminal_availability()
     }
 
     // --- feature: trash ---

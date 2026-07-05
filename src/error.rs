@@ -1,11 +1,9 @@
-#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use std::fmt;
 use std::path::PathBuf;
 
 use thiserror::Error;
 
-#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub enum Operation {
     Open,
@@ -13,7 +11,6 @@ pub enum Operation {
     Terminal,
 }
 
-#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 impl fmt::Display for Operation {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -29,7 +26,6 @@ impl fmt::Display for Operation {
 pub enum FileHandleError {
     #[error("Path not found: {0}")]
     NotFound(PathBuf),
-    #[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
     #[error("no OS handler available for {operation} (tried: {tried:?})")]
     NoHandlerAvailable {
         operation: Operation,

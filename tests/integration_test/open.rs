@@ -17,6 +17,7 @@ fn test_not_found_error() {
 
 /// Integration test for opening a file with its default application.
 #[test]
+#[ignore = "opens the system default application"]
 fn test_open_file_integration() {
     let dir = tempdir().unwrap();
     let file_path = dir.path().join("test_open.txt");
@@ -42,6 +43,7 @@ fn test_open_file_integration() {
 
 /// Integration test for opening a directory with its default app.
 #[test]
+#[ignore = "opens the system default application"]
 fn test_open_directory_integration() {
     let dir = tempdir().unwrap();
 

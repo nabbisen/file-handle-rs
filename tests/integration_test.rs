@@ -4,6 +4,11 @@
 //
 // # mock run:
 // cargo run --example smoke_test --features show
+//
+// Real desktop-handler tests are ignored by default because they can open file
+// managers, browsers, or terminal applications on developer machines.
+// Run them explicitly with:
+// cargo test --all-features -- --ignored
 // ```
 
 #[cfg(feature = "open")]

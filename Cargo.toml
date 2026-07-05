@@ -1,6 +1,6 @@
 [package]
 name = "file-handle"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 
 description = "A lean lib to manage files: open with default apps, reveal in managers or terminals, or trash files."
@@ -11,7 +11,7 @@ categories = ["filesystem"]
 keywords = ["filesystem", "file"]
 repository = "https://github.com/nabbisen/file-handle-rs"
 readme = "README.md"
-rust-version = "1.90"
+rust-version = "1.87"
 
 [features]
 # function isolation for minimal build

@@ -1,13 +1,18 @@
-#[allow(unused_imports)]
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use std::path::Path;
-#[allow(unused_imports)]
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use std::process::Command;
 
 use super::FileHandle;
-#[allow(unused_imports)]
+#[cfg(feature = "terminal")]
+use crate::Availability;
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use crate::FileHandleError;
 #[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use crate::Operation;
+
+#[cfg(feature = "terminal")]
+const SYSTEM_OPEN: &str = "/usr/bin/open";
 
 impl FileHandle {
     #[cfg(feature = "open")]
@@ -38,13 +43,22 @@ impl FileHandle {
 
     #[cfg(feature = "terminal")]
     pub fn dispatch_terminal(path: &Path) -> Result<(), FileHandleError> {
-        let mut child = Command::new("open")
+        let mut child = Command::new(SYSTEM_OPEN)
             .args(["-a", "Terminal"])
             .arg(path)
             .spawn()
-            .map_err(|e| Self::map_spawn_error(Operation::Terminal, "open", e))?;
+            .map_err(|e| Self::map_spawn_error(Operation::Terminal, SYSTEM_OPEN, e))?;
 
-        Self::wait_for_command(Operation::Terminal, "open", &mut child)
+        Self::wait_for_command(Operation::Terminal, SYSTEM_OPEN, &mut child)
+    }
+
+    #[cfg(feature = "terminal")]
+    pub fn dispatch_terminal_availability() -> Availability {
+        if Path::new(SYSTEM_OPEN).is_file() {
+            Availability::Available
+        } else {
+            Availability::Unavailable
+        }
     }
 
     #[cfg(any(feature = "open", feature = "show", feature = "terminal"))]

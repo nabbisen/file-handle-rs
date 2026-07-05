@@ -8,6 +8,18 @@ the operation returns `FileHandleError::NoHandlerAvailable`.
 This error is intended for user-facing messages such as "no terminal emulator is
 available" without string-matching generic operation failures.
 
+## Terminal Availability Probe
+
+`Availability` is always exported. With the `terminal` feature enabled,
+`FileHandle::terminal_availability()` returns `Available`, `Unavailable`, or
+`Unknown` for the current process environment.
+
+The probe is advisory and side-effect free. It does not validate a target path,
+does not spawn a terminal, and does not replace `open_terminal` error handling.
+Treat `Unknown` like "keep the action available, then handle the real operation
+result." Treat `Unavailable` as useful UI or fallback guidance, not as a
+security or permanent policy decision.
+
 ## Launcher Status
 
 Native launcher commands are checked for non-zero exit status. A non-zero status

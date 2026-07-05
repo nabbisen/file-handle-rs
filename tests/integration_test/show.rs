@@ -17,6 +17,7 @@ fn test_not_found_error() {
 
 /// Integration test for feature = "show".
 #[test]
+#[ignore = "opens the system file manager"]
 fn test_show_integration() {
     let dir = tempdir().unwrap();
     let file_path = dir.path().join("test_file.txt");

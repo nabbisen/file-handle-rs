@@ -1,10 +1,14 @@
-#[allow(unused_imports)]
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use std::path::Path;
-#[allow(unused_imports)]
+#[cfg(feature = "terminal")]
+use std::path::PathBuf;
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use std::process::Command;
 
 use super::FileHandle;
-#[allow(unused_imports)]
+#[cfg(feature = "terminal")]
+use crate::Availability;
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use crate::FileHandleError;
 #[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use crate::Operation;
@@ -36,13 +40,54 @@ impl FileHandle {
 
     #[cfg(feature = "terminal")]
     pub fn dispatch_terminal(path: &Path) -> Result<(), FileHandleError> {
-        let mut child = Command::new("cmd")
+        let Some(cmd_path) = Self::trusted_cmd_path() else {
+            return Err(Self::no_handler(
+                Operation::Terminal,
+                ["%ComSpec%", "%SystemRoot%\\System32\\cmd.exe"],
+            ));
+        };
+        let command_name = cmd_path.display().to_string();
+
+        // This resolves the outer cmd.exe through trusted locations. The
+        // `cmd /C start` launch strategy itself remains Windows shell debt.
+        let mut child = Command::new(&cmd_path)
             .args(["/C", "start", "cmd.exe"])
             .current_dir(path)
             .spawn()
-            .map_err(|e| Self::map_spawn_error(Operation::Terminal, "cmd", e))?;
+            .map_err(|e| Self::map_spawn_error(Operation::Terminal, &command_name, e))?;
 
-        Self::wait_for_command(Operation::Terminal, "cmd", &mut child)
+        Self::wait_for_command(Operation::Terminal, &command_name, &mut child)
+    }
+
+    #[cfg(feature = "terminal")]
+    pub fn dispatch_terminal_availability() -> Availability {
+        if Self::trusted_cmd_path().is_some() {
+            Availability::Available
+        } else {
+            Availability::Unavailable
+        }
+    }
+
+    #[cfg(feature = "terminal")]
+    fn trusted_cmd_path() -> Option<PathBuf> {
+        Self::trusted_cmd_path_from(std::env::var_os("ComSpec"), std::env::var_os("SystemRoot"))
+    }
+
+    #[cfg(feature = "terminal")]
+    pub(crate) fn trusted_cmd_path_from(
+        comspec: Option<std::ffi::OsString>,
+        system_root: Option<std::ffi::OsString>,
+    ) -> Option<PathBuf> {
+        comspec
+            .map(PathBuf::from)
+            .filter(|path| path.is_absolute() && path.is_file())
+            .or_else(|| {
+                let mut path = PathBuf::from(system_root?);
+                path.push("System32");
+                path.push("cmd.exe");
+
+                if path.is_file() { Some(path) } else { None }
+            })
     }
 
     #[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
@@ -74,6 +119,17 @@ impl FileHandle {
             }
         } else {
             error.into()
+        }
+    }
+
+    #[cfg(feature = "terminal")]
+    fn no_handler<'a>(
+        operation: Operation,
+        tried: impl IntoIterator<Item = &'a str>,
+    ) -> FileHandleError {
+        FileHandleError::NoHandlerAvailable {
+            operation,
+            tried: tried.into_iter().map(str::to_owned).collect(),
         }
     }
 }

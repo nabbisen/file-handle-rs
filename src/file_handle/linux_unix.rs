@@ -1,11 +1,19 @@
-#[allow(unused_imports)]
+#[cfg(feature = "terminal")]
+use std::ffi::OsStr;
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use std::path::Path;
 
 use super::FileHandle;
-#[allow(unused_imports)]
+#[cfg(feature = "terminal")]
+use crate::Availability;
+#[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use crate::FileHandleError;
 #[cfg(any(feature = "open", feature = "show", feature = "terminal"))]
 use crate::Operation;
+
+#[cfg(feature = "terminal")]
+pub(crate) const TERMINAL_CANDIDATES: &[&str] =
+    &["xdg-terminal-exec", "gnome-terminal", "konsole", "xterm"];
 
 impl FileHandle {
     #[cfg(feature = "open")]
@@ -82,10 +90,7 @@ impl FileHandle {
 
     #[cfg(feature = "terminal")]
     pub fn dispatch_terminal(path: &Path) -> Result<(), FileHandleError> {
-        Self::dispatch_terminal_with(
-            path,
-            ["xdg-terminal-exec", "gnome-terminal", "konsole", "xterm"],
-        )
+        Self::dispatch_terminal_with(path, TERMINAL_CANDIDATES.iter().copied())
     }
 
     #[cfg(feature = "terminal")]
@@ -108,6 +113,81 @@ impl FileHandle {
         }
 
         Err(Self::no_handler(Operation::Terminal, terminals))
+    }
+
+    #[cfg(feature = "terminal")]
+    pub fn dispatch_terminal_availability() -> Availability {
+        let path = std::env::var_os("PATH");
+        let display = std::env::var_os("DISPLAY");
+        let wayland_display = std::env::var_os("WAYLAND_DISPLAY");
+
+        Self::terminal_availability_with(
+            TERMINAL_CANDIDATES.iter().copied(),
+            path.as_deref(),
+            display.as_deref(),
+            wayland_display.as_deref(),
+        )
+    }
+
+    #[cfg(feature = "terminal")]
+    pub(crate) fn terminal_availability_with<'a>(
+        terminals: impl IntoIterator<Item = &'a str>,
+        search_path: Option<&OsStr>,
+        display: Option<&OsStr>,
+        wayland_display: Option<&OsStr>,
+    ) -> Availability {
+        if Self::is_headless_display(display, wayland_display) {
+            return Availability::Unavailable;
+        }
+
+        if terminals
+            .into_iter()
+            .any(|terminal| Self::command_available_on_path(terminal, search_path))
+        {
+            Availability::Available
+        } else {
+            Availability::Unavailable
+        }
+    }
+
+    #[cfg(feature = "terminal")]
+    pub(crate) fn command_available_on_path(command: &str, search_path: Option<&OsStr>) -> bool {
+        let Some(search_path) = search_path else {
+            return false;
+        };
+
+        std::env::split_paths(search_path).any(|dir| {
+            if dir.as_os_str().is_empty() || !dir.is_dir() {
+                return false;
+            }
+
+            Self::is_executable_file(&dir.join(command))
+        })
+    }
+
+    #[cfg(feature = "terminal")]
+    fn is_headless_display(display: Option<&OsStr>, wayland_display: Option<&OsStr>) -> bool {
+        fn missing(value: Option<&OsStr>) -> bool {
+            value.is_none_or(OsStr::is_empty)
+        }
+
+        missing(display) && missing(wayland_display)
+    }
+
+    #[cfg(all(unix, feature = "terminal"))]
+    fn is_executable_file(path: &Path) -> bool {
+        use std::os::unix::fs::PermissionsExt;
+
+        let Ok(metadata) = path.metadata() else {
+            return false;
+        };
+
+        metadata.is_file() && metadata.permissions().mode() & 0o111 != 0
+    }
+
+    #[cfg(all(not(unix), feature = "terminal"))]
+    fn is_executable_file(path: &Path) -> bool {
+        path.is_file()
     }
 
     #[cfg(any(feature = "open", feature = "terminal"))]
